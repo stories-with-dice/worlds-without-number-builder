@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.pdf
+# Data extracted from your own copy of the Deluxe PDF. Never commit it.
+premium/
+premium.json
+.DS_Store
+*.pdf

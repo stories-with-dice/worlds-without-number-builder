@@ -1,0 +1,28 @@
+{
+  "name": "wwn-worldbuilder",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Hex-map world builder for Worlds Without Number, in the style of Sectors Without Number.",
+  "bin": {
+    "wwn-premium": "tools/premium-cli.mjs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "data:free": "node tools/build-free-data.mjs",
+    "premium": "node tools/premium-cli.mjs",
+    "plugin:leaflet": "node tools/fetch-leaflet-plugin.mjs",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4"
+  },
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "pdfjs-dist": "^4.10.38"
+  }
+}
