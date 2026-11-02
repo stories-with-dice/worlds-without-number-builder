@@ -6,7 +6,7 @@ All generation follows the procedures and random tables in *Worlds Without Numbe
 
 ## Quick start
 
-Requirements: Node.js 20 or later.
+Requirements: Node.js 20 or later. For a step-by-step setup on Windows or Mac, see [docs/premium-setup.md](docs/premium-setup.md).
 
 ```bash
 npm install
@@ -114,6 +114,8 @@ The free edition of *Worlds Without Number* is the source of all bundled data (`
 - Architectural styles for nations
 - Infernal Iterums and summoned Iterum creatures
 - Adventure hooks and oracle tables
+
+New to the command line? Read the [step-by-step guide for Windows and Mac](docs/premium-setup.md). It shows how to download the app, install Node.js, and make the premium data file.
 
 To unlock them, extract the data from **your own copy** of the Deluxe PDF:
 
