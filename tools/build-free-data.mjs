@@ -6,8 +6,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { openBook } from './lib/pdftext.mjs';
 import { detectEdition } from './lib/edition.mjs';
-import { extractTables, extractMatrix, extractDefinitions, extractAssets, parseTags } from './lib/extract.mjs';
-import { freeTables, freeMatrices, freeTags } from './manifest-free.mjs';
+import { extractTables, extractMatrix, extractGrid, extractDefinitions, extractAssets, parseTags } from './lib/extract.mjs';
+import { freeTables, freeMatrices, freeGrids, freeTags } from './manifest-free.mjs';
 
 const pdf = process.argv[2] ?? 'WorldsWithoutNumber_FreePDF_Lightweight_040221.pdf';
 const out = process.argv[3] ?? 'src/data/free.json';
@@ -25,6 +25,8 @@ if (edition !== 'free') {
 const tables = await extractTables(book, freeTables, log);
 const matrices = {};
 for (const m of freeMatrices) Object.assign(matrices, await extractMatrix(book, m.page, m));
+const grids = {};
+for (const g of freeGrids) Object.assign(grids, await extractGrid(book, g.page, g));
 
 const tags = {};
 for (const { kind, from, to } of freeTags) {
@@ -50,7 +52,7 @@ const data = {
   source: 'Worlds Without Number, free edition (Sine Nomine Publishing, 2021)',
   edition: 'free',
   generatedAt: new Date().toISOString().slice(0, 10),
-  tables: { ...tables, ...matrices },
+  tables: { ...tables, ...matrices, ...grids },
   tags,
   factions: { tags: factionTags, goals, assets },
 };

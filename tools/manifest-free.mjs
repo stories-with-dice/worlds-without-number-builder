@@ -160,10 +160,25 @@ export const freeTables = [
   t('dungeon.mood', 247, 'What Mood'),
   t('events.wilderness', 247, 'Example Wilderness Events'),
   t('events.dungeon', 247, 'Example Dungeon Events'),
+  // Investigation challenges (p250-251)
+  t('invest.twists', 250, 'Twists to the Resolution'),
+  t('invest.complications', 250, 'Possible Investigation Complications'),
+  t('invest.intro', 250, 'Why Is the Intro'),
+  t('invest.hook', 251, 'What Makes the Hook'),
+  t('invest.reaction', 251, "What's Their First Instinct"),
+  t('invest.clueCost', 251, "What's the Cost of the Clue"),
+  // Social challenges (p253)
+  t('social.learn', 253, 'How Do The PCs Learn'),
+  t('social.cooperate', 253, "Why Won't They Cooperate"),
+  t('social.weakness', 253, "What's Their Weakest Point"),
+  t('social.mood', 253, "What's Their Current Mood"),
+  t('social.want', 253, 'What Do They Want Accomplished'),
+  t('social.twists', 253, 'Twists to the Negotiation'),
   // Treasure (p257)
   t('treasure.jewelry', 257, 'Types of Jewelry'),
   t('treasure.valuables', 257, 'Valuable Objects'),
   t('treasure.whyValuable', 257, 'Why is the Object'),
+  t('treasure.magicType', 257, 'Type of Magic Item Found'),
   // Monsters (p284-293)
   t('monster.blightIntent', 284, 'What Was the Creator'),
   t('monster.blightQualities', 284, 'Example Blighted'),
@@ -191,6 +206,12 @@ export const freeTables = [
 export const freeMatrices = [
   { page: 238, id: 'dungeon.siteTypes', title: 'Types of Ruin Sites' },
   { page: 241, id: 'dungeon.rooms', title: 'Rooms of Interest', groupMaxX: 120 },
+];
+
+// Tables with a name column and labeled value columns, not a die column.
+export const freeGrids = [
+  { page: 256, id: 'treasure.siteValue', title: 'Silver Piece Value', header: 'Type of Site' },
+  { page: 257, id: 'treasure.magicChance', title: 'Chance for Magic Items', header: 'Type of Trove' },
 ];
 
 export const freeTags = [

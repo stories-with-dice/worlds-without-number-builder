@@ -1,7 +1,7 @@
 {
  "source": "Worlds Without Number, free edition (Sine Nomine Publishing, 2021)",
  "edition": "free",
- "generatedAt": "2026-10-30",
+ "generatedAt": "2026-11-02",
  "tables": {
   "geo.terrain": {
    "title": "Significant Terrain Features",
@@ -11208,6 +11208,570 @@
     }
    ]
   },
+  "invest.twists": {
+   "title": "Twists to the Resolution",
+   "die": 6,
+   "page": 250,
+   "rows": [
+    {
+     "min": 1,
+     "max": 1,
+     "text": "The culprit or object actually had a reason to want the mystery to be solved"
+    },
+    {
+     "min": 2,
+     "max": 2,
+     "text": "The culprit’s actions are being shaped or influenced by seemingly-uninvolved party"
+    },
+    {
+     "min": 3,
+     "max": 3,
+     "text": "Someone who ought to be happy about the discovery will actually have cause to regret it"
+    },
+    {
+     "min": 4,
+     "max": 4,
+     "text": "The resolution carries hints of an even larger mystery the PCs may or may not pursue"
+    },
+    {
+     "min": 5,
+     "max": 5,
+     "text": "The resolution coincidentally entangles itself in a completely unrelated social conflict"
+    },
+    {
+     "min": 6,
+     "max": 6,
+     "text": "The most obvious act to resolve the mystery is one that comes at some dear price"
+    }
+   ]
+  },
+  "invest.complications": {
+   "title": "Possible Investigation Complications",
+   "die": 6,
+   "page": 250,
+   "rows": [
+    {
+     "min": 1,
+     "max": 1,
+     "text": "The information is obviously time-sensitive, and the PCs know they have to hurry to get it"
+    },
+    {
+     "min": 2,
+     "max": 2,
+     "text": "There’s an obvious, easy way to get the information but it’s morally repugnant"
+    },
+    {
+     "min": 3,
+     "max": 3,
+     "text": "Unless obtained carefully, the info is only partial, enough to direct but missing vital bits"
+    },
+    {
+     "min": 4,
+     "max": 4,
+     "text": "The information is of a sort the party will be absolutely certain to be unhappy to learn"
+    },
+    {
+     "min": 5,
+     "max": 5,
+     "text": "The information is true, but deeply misleading unless the full context is investigated"
+    },
+    {
+     "min": 6,
+     "max": 6,
+     "text": "An ally is going to be hurt if the PCs obtain the information."
+    }
+   ]
+  },
+  "invest.intro": {
+   "title": "Why Is the Intro Worth Following Up On?",
+   "die": 6,
+   "page": 250,
+   "rows": [
+    {
+     "min": 1,
+     "max": 1,
+     "text": "Some known enemy or suspicious person clearly does not want them to follow it up"
+    },
+    {
+     "min": 2,
+     "max": 2,
+     "text": "The manner of its discovery makes clear that somebody was trying to keep it hidden"
+    },
+    {
+     "min": 3,
+     "max": 3,
+     "text": "An ally or existing NPC they trust has reason to vouch for its validity"
+    },
+    {
+     "min": 4,
+     "max": 4,
+     "text": "The introduction comes with a reward or token that is enticingly valuable"
+    },
+    {
+     "min": 5,
+     "max": 5,
+     "text": "Part of the introduction involves facts or elements that the PCs already know are true"
+    },
+    {
+     "min": 6,
+     "max": 6,
+     "text": "The intro happens to lead them in a direction they were already planning on going"
+    }
+   ]
+  },
+  "invest.hook": {
+   "title": "What Makes the Hook So Enticing?",
+   "die": 6,
+   "page": 251,
+   "rows": [
+    {
+     "min": 1,
+     "max": 1,
+     "text": "A great sum of wealth or the promise of rich treasures are dangled by it"
+    },
+    {
+     "min": 2,
+     "max": 2,
+     "text": "Following the hook would clearly win great favor with an important NPC"
+    },
+    {
+     "min": 3,
+     "max": 3,
+     "text": "An allied NPC or friendly character is appealing to them to follow it up"
+    },
+    {
+     "min": 4,
+     "max": 4,
+     "text": "Following it would clearly hurt or discomfit a person or group the PCs hate"
+    },
+    {
+     "min": 5,
+     "max": 5,
+     "text": "Following it offers an easy escape from some current bad situation or approaching foe"
+    },
+    {
+     "min": 6,
+     "max": 6,
+     "text": "The hook directly ties into an ambition or goal of one of the PCs"
+    }
+   ]
+  },
+  "invest.reaction": {
+   "title": "What’s Their First Instinct of Reaction?",
+   "die": 6,
+   "page": 251,
+   "rows": [
+    {
+     "min": 1,
+     "max": 1,
+     "text": "They invoke some kind of summoned beast or occult peril against the investigators"
+    },
+    {
+     "min": 2,
+     "max": 2,
+     "text": "They call on favors or mundane agents to wield secular forces against the PCs"
+    },
+    {
+     "min": 3,
+     "max": 3,
+     "text": "They put pressure on friendly NPCs or threaten allies to get the PCs to back off"
+    },
+    {
+     "min": 4,
+     "max": 4,
+     "text": "They offer bribes that are genuinely tempting to the PCs"
+    },
+    {
+     "min": 5,
+     "max": 5,
+     "text": "Their minions or direct servitors seek to use brute violence to quell the PCs"
+    },
+    {
+     "min": 6,
+     "max": 6,
+     "text": "They change locations or plans in an attempt to throw the PCs off the scent"
+    }
+   ]
+  },
+  "invest.clueCost": {
+   "title": "What’s the Cost of the Clue?",
+   "die": 6,
+   "page": 251,
+   "rows": [
+    {
+     "min": 1,
+     "max": 1,
+     "text": "A sympathetic or friendly NPC dies in the process of revealing the clue to the PCs"
+    },
+    {
+     "min": 2,
+     "max": 2,
+     "text": "The coincidence that reveals the clue also greatly strengthens the culprit"
+    },
+    {
+     "min": 3,
+     "max": 3,
+     "text": "Some portion of a treasure or reward is spoiled by the way the clue is revealed"
+    },
+    {
+     "min": 4,
+     "max": 4,
+     "text": "A positive NPC relationship with the PCs is sacrificed by the circumstances of the scene"
+    },
+    {
+     "min": 5,
+     "max": 5,
+     "text": "The culprit becomes acutely aware of the PCs’ involvement by the way the clue is revealed"
+    },
+    {
+     "min": 6,
+     "max": 6,
+     "text": "The clue’s revelation is made contingent on the PCs making some significant sacrifice"
+    }
+   ]
+  },
+  "social.learn": {
+   "title": "How Do The PCs Learn About Them?",
+   "die": 6,
+   "page": 253,
+   "rows": [
+    {
+     "min": 1,
+     "max": 1,
+     "text": "They have a mutual acquaintance"
+    },
+    {
+     "min": 2,
+     "max": 2,
+     "text": "They were involved in a problem the PCs had"
+    },
+    {
+     "min": 3,
+     "max": 3,
+     "text": "Their name is widely known to the public"
+    },
+    {
+     "min": 4,
+     "max": 4,
+     "text": "They do something that the PCs will notice"
+    },
+    {
+     "min": 5,
+     "max": 5,
+     "text": "An NPC ally mentions them to the PCs"
+    },
+    {
+     "min": 6,
+     "max": 6,
+     "text": "They have a reason to seek the PCs out"
+    }
+   ]
+  },
+  "social.cooperate": {
+   "title": "Why Won’t They Cooperate?",
+   "die": 8,
+   "page": 253,
+   "rows": [
+    {
+     "min": 1,
+     "max": 1,
+     "text": "They’re too absorbed in some other issue"
+    },
+    {
+     "min": 2,
+     "max": 2,
+     "text": "They’re being watched by a rival"
+    },
+    {
+     "min": 3,
+     "max": 3,
+     "text": "They begrudge the PCs for some reason"
+    },
+    {
+     "min": 4,
+     "max": 4,
+     "text": "They want more than the PCs can give"
+    },
+    {
+     "min": 5,
+     "max": 5,
+     "text": "They’re afraid of the consequences"
+    },
+    {
+     "min": 6,
+     "max": 6,
+     "text": "They doubt their ability to do it"
+    },
+    {
+     "min": 7,
+     "max": 7,
+     "text": "They think the PCs aren’t worth their time"
+    },
+    {
+     "min": 8,
+     "max": 8,
+     "text": "Someone they care about is against it"
+    }
+   ]
+  },
+  "social.weakness": {
+   "title": "What’s Their Weakest Point?",
+   "die": 10,
+   "page": 253,
+   "rows": [
+    {
+     "min": 1,
+     "max": 1,
+     "text": "There exists grave blackmail on them"
+    },
+    {
+     "min": 2,
+     "max": 2,
+     "text": "They’re enamored of a manipulator"
+    },
+    {
+     "min": 3,
+     "max": 3,
+     "text": "They’re a physical coward"
+    },
+    {
+     "min": 4,
+     "max": 4,
+     "text": "They’re in serious and pressing debt"
+    },
+    {
+     "min": 5,
+     "max": 5,
+     "text": "A rival is beating them at their own game"
+    },
+    {
+     "min": 6,
+     "max": 6,
+     "text": "They recently made a grave error of judgment"
+    },
+    {
+     "min": 7,
+     "max": 7,
+     "text": "They’re lamentably overconfident"
+    },
+    {
+     "min": 8,
+     "max": 8,
+     "text": "Their social standing is being undermined"
+    },
+    {
+     "min": 9,
+     "max": 9,
+     "text": "Someone they love makes horrible choices"
+    },
+    {
+     "min": 10,
+     "max": 10,
+     "text": "An underling plots to betray them"
+    }
+   ]
+  },
+  "social.mood": {
+   "title": "What’s Their Current Mood?",
+   "die": 4,
+   "page": 253,
+   "rows": [
+    {
+     "min": 1,
+     "max": 1,
+     "text": "Something good happened; they’re happy"
+    },
+    {
+     "min": 2,
+     "max": 2,
+     "text": "It’s just a day like any other"
+    },
+    {
+     "min": 3,
+     "max": 3,
+     "text": "Uncharitable, tired, bored, or irritated"
+    },
+    {
+     "min": 4,
+     "max": 4,
+     "text": "Something bad happened that upset them"
+    }
+   ]
+  },
+  "social.want": {
+   "title": "What Do They Want Accomplished?",
+   "die": 12,
+   "page": 253,
+   "rows": [
+    {
+     "min": 1,
+     "max": 1,
+     "text": "They want someone murdered"
+    },
+    {
+     "min": 2,
+     "max": 2,
+     "text": "They want to make a lot of money"
+    },
+    {
+     "min": 3,
+     "max": 3,
+     "text": "They want to discredit a rival"
+    },
+    {
+     "min": 4,
+     "max": 4,
+     "text": "They want to help a friend or ally in trouble"
+    },
+    {
+     "min": 5,
+     "max": 5,
+     "text": "They want a mystery solved"
+    },
+    {
+     "min": 6,
+     "max": 6,
+     "text": "They want a monster slain"
+    },
+    {
+     "min": 7,
+     "max": 7,
+     "text": "They want to elevate their social standing"
+    },
+    {
+     "min": 8,
+     "max": 8,
+     "text": "They want someone subverted to their cause"
+    },
+    {
+     "min": 9,
+     "max": 9,
+     "text": "They want a crime committed"
+    },
+    {
+     "min": 10,
+     "max": 10,
+     "text": "They want someone to be driven away"
+    },
+    {
+     "min": 11,
+     "max": 11,
+     "text": "They want to obtain a particular object"
+    },
+    {
+     "min": 12,
+     "max": 12,
+     "text": "They want a matter hushed up"
+    }
+   ]
+  },
+  "social.twists": {
+   "title": "Twists to the Negotiation",
+   "die": 20,
+   "page": 253,
+   "rows": [
+    {
+     "min": 1,
+     "max": 1,
+     "text": "They’re planning on reneging on the deal"
+    },
+    {
+     "min": 2,
+     "max": 2,
+     "text": "They misunderstand what the PCs want"
+    },
+    {
+     "min": 3,
+     "max": 3,
+     "text": "They’ll deal only at a dangerous location"
+    },
+    {
+     "min": 4,
+     "max": 4,
+     "text": "They somehow think the PCs betrayed them"
+    },
+    {
+     "min": 5,
+     "max": 5,
+     "text": "They have a reason to want to make the deal"
+    },
+    {
+     "min": 6,
+     "max": 6,
+     "text": "They hate to negotiate directly with the PCs"
+    },
+    {
+     "min": 7,
+     "max": 7,
+     "text": "Someone wants to make them a better offer"
+    },
+    {
+     "min": 8,
+     "max": 8,
+     "text": "They think too much of the PCs’ capabilities"
+    },
+    {
+     "min": 9,
+     "max": 9,
+     "text": "They think the PCs are someone else’s agents"
+    },
+    {
+     "min": 10,
+     "max": 10,
+     "text": "Payment is a ruse to cover for their real desire"
+    },
+    {
+     "min": 11,
+     "max": 11,
+     "text": "What they want will turn out terribly for them"
+    },
+    {
+     "min": 12,
+     "max": 12,
+     "text": "They’re so open that they seem suspicious"
+    },
+    {
+     "min": 13,
+     "max": 13,
+     "text": "They’re the front man for the real target"
+    },
+    {
+     "min": 14,
+     "max": 14,
+     "text": "Someone’s tracking those they deal with"
+    },
+    {
+     "min": 15,
+     "max": 15,
+     "text": "Their request is much harder than it seems"
+    },
+    {
+     "min": 16,
+     "max": 16,
+     "text": "Their request has a very harsh time limit"
+    },
+    {
+     "min": 17,
+     "max": 17,
+     "text": "Their request changes mid-stream"
+    },
+    {
+     "min": 18,
+     "max": 18,
+     "text": "Their request hurts the PCs’ interests"
+    },
+    {
+     "min": 19,
+     "max": 19,
+     "text": "PCs need to be vouched-for to meet them"
+    },
+    {
+     "min": 20,
+     "max": 20,
+     "text": "They’re also doing favors for PC enemies"
+    }
+   ]
+  },
   "treasure.jewelry": {
    "title": "Types of Jewelry",
    "die": 8,
@@ -11466,6 +12030,53 @@
      "min": 20,
      "max": 20,
      "text": "Its material can no longer be produced"
+    }
+   ]
+  },
+  "treasure.magicType": {
+   "title": "Type of Magic Item Found",
+   "die": 20,
+   "page": 257,
+   "rows": [
+    {
+     "min": 1,
+     "max": 6,
+     "text": "Elixir"
+    },
+    {
+     "min": 7,
+     "max": 7,
+     "text": "Exemplar or Grimoire"
+    },
+    {
+     "min": 8,
+     "max": 8,
+     "text": "1d3 Ancient Salvage for modifications"
+    },
+    {
+     "min": 9,
+     "max": 11,
+     "text": "Calyx"
+    },
+    {
+     "min": 12,
+     "max": 14,
+     "text": "Weapon"
+    },
+    {
+     "min": 15,
+     "max": 16,
+     "text": "Armor"
+    },
+    {
+     "min": 17,
+     "max": 17,
+     "text": "Shield"
+    },
+    {
+     "min": 18,
+     "max": 20,
+     "text": "Device"
     }
    ]
   },
@@ -12933,6 +13544,291 @@
       "Secret or unobtrusive entrance",
       "Grand passage or ornate corridor",
       "Barn or fodder storage"
+     ]
+    }
+   ]
+  },
+  "treasure.siteValue": {
+   "title": "Silver Piece Value of the Site’s Contents",
+   "page": 256,
+   "columns": [
+    "2–3",
+    "4–5",
+    "6–8",
+    "9–10",
+    "11–12"
+   ],
+   "lines": [
+    {
+     "name": "Minor bandit cache or petty find",
+     "cells": [
+      "1d6",
+      "1d6 x 10",
+      "1d6 x 25",
+      "1d6 x 50",
+      "1d6 x 100"
+     ]
+    },
+    {
+     "name": "Successful bandit chief's loot",
+     "cells": [
+      "1d6 x 10",
+      "2d6 x 20",
+      "2d6 x 50",
+      "2d10 x 50",
+      "2d10 x 100"
+     ]
+    },
+    {
+     "name": "Rural noble or gentry's estate",
+     "cells": [
+      "1d6 x 100",
+      "2d6 x 100",
+      "2d10 x 100",
+      "1d4 x 1,000",
+      "1d8 x 1,000"
+     ]
+    },
+    {
+     "name": "Great noble's country estate",
+     "cells": [
+      "1d6 x 500",
+      "2d6 x 500",
+      "2d6 x 2,000",
+      "2d10 x 2,000",
+      "2d10 x 4,000"
+     ]
+    },
+    {
+     "name": "Solitary dangerous monster's loot",
+     "cells": [
+      "1d10 x 50",
+      "1d8 x 100",
+      "2d10 x 250",
+      "2d4 x 1,000",
+      "4d6 x 1,000"
+     ]
+    },
+    {
+     "name": "Solitary legendary monster's trove",
+     "cells": [
+      "1d10 x 1,000",
+      "1d8 x 10,000",
+      "3d10 x 10,000",
+      "3d6 x 20,000",
+      "2d6 x 50,000"
+     ]
+    },
+    {
+     "name": "Minor Deep or ancient ruin",
+     "cells": [
+      "1d6 x 500",
+      "1d6 x 1,000",
+      "3d6 x 1,000",
+      "2d6 x 2,000",
+      "2d6 x 5,000"
+     ]
+    },
+    {
+     "name": "Significant Deep or ancient ruin",
+     "cells": [
+      "1d6 x 1,000",
+      "1d4 x 5,000",
+      "2d4 x 10,000",
+      "2d8 x 10,000",
+      "4d6 x 10,000"
+     ]
+    },
+    {
+     "name": "Sprawling Deep or megadungeon",
+     "cells": [
+      "1d6 x 5,000",
+      "2d6 x 10,000",
+      "1d4 x 50,000",
+      "1d10 x 50,000",
+      "2d6 x 50,000"
+     ]
+    },
+    {
+     "name": "Merchant prince's estate",
+     "cells": [
+      "1d10 x 100",
+      "2d6 x 500",
+      "2d6 x 2,000",
+      "1d10 x 5,000",
+      "2d6 x 5,000"
+     ]
+    },
+    {
+     "name": "Outsider settlement or outpost",
+     "cells": [
+      "1d8 x 1,000",
+      "2d10 x 1,000",
+      "1d4 x 10,000",
+      "1d10 x 10,000",
+      "3d6 x 10,000"
+     ]
+    },
+    {
+     "name": "Outsider city or major power center",
+     "cells": [
+      "2d6 x 1,000",
+      "1d8 x 10,000",
+      "1d10 x 20,000",
+      "2d10 x 20,000",
+      "3d10 x 20,000"
+     ]
+    },
+    {
+     "name": "Ancient royal palace or seat of rule",
+     "cells": [
+      "2d6 x 1,000",
+      "1d6 x 5,000",
+      "2d6 x 10,000",
+      "1d6 x 50,000",
+      "2d6 x 50,000"
+     ]
+    },
+    {
+     "name": "Richly adorned great temple",
+     "cells": [
+      "1d6 x 1,000",
+      "2d10 x 1,000",
+      "3d6 x 5,000",
+      "2d6 x 10,000",
+      "2d6 x 20,000"
+     ]
+    },
+    {
+     "name": "Lost settlement of limited size",
+     "cells": [
+      "2d6 x 100",
+      "1d6 x 500",
+      "1d10 x 1,000",
+      "2d8 x 1,000",
+      "1d10 x 5,000"
+     ]
+    },
+    {
+     "name": "Lost city with many explorable areas",
+     "cells": [
+      "1d6 x 1,000",
+      "2d8 x 1,000",
+      "2d8 x 5,000",
+      "4d6 x 10,000",
+      "4d6 x 20,000"
+     ]
+    },
+    {
+     "name": "Great wizard's domicile",
+     "cells": [
+      "1d8 x 1,000",
+      "2d6 x 2,000",
+      "2d6 x 5,000",
+      "1d6 x 20,000",
+      "1d12 x 20,000"
+     ]
+    }
+   ]
+  },
+  "treasure.magicChance": {
+   "title": "Chance for Magic Items Rolled",
+   "page": 257,
+   "columns": [
+    "No Items",
+    "One Item",
+    "Two Items",
+    "Three or More"
+   ],
+   "lines": [
+    {
+     "name": "Trove of 1 HD creature",
+     "cells": [
+      "1–19",
+      "20",
+      "N/A",
+      "N/A"
+     ]
+    },
+    {
+     "name": "Trove of 2-4 HD creature",
+     "cells": [
+      "1–18",
+      "19",
+      "20",
+      "N/A"
+     ]
+    },
+    {
+     "name": "Trove of 5-10 HD creature",
+     "cells": [
+      "1–10",
+      "11–17",
+      "18–19",
+      "20"
+     ]
+    },
+    {
+     "name": "Trove of 11+ HD creature",
+     "cells": [
+      "N/A",
+      "1–8",
+      "9–16",
+      "17–20"
+     ]
+    },
+    {
+     "name": "Minor unguarded trove",
+     "cells": [
+      "1–18",
+      "19–20",
+      "N/A",
+      "N/A"
+     ]
+    },
+    {
+     "name": "Major unguarded trove",
+     "cells": [
+      "1–5",
+      "6–18",
+      "19",
+      "20"
+     ]
+    },
+    {
+     "name": "Adventurer or noble",
+     "cells": [
+      "1–10",
+      "11–19",
+      "20",
+      "N/A"
+     ]
+    },
+    {
+     "name": "Veteran adventurer",
+     "cells": [
+      "N/A",
+      "1–5",
+      "6–15",
+      "16–20"
+     ]
+    },
+    {
+     "name": "Minor mage or shaman",
+     "cells": [
+      "1–10",
+      "11–18",
+      "19–20",
+      "N/A"
+     ]
+    },
+    {
+     "name": "Great wizard",
+     "cells": [
+      "N/A",
+      "N/A",
+      "1–5",
+      "6–20"
      ]
     }
    ]

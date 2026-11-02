@@ -43,6 +43,9 @@ The output is in `dist/`.
 | Site density: one die per hex, a 1-2 means a site (d6 dense to d12 sparse; d20 is an extra option) | Hex Points of Interest, p242 |
 | Factions with attributes, hit points, assets, tags, goals, and rivals | Factions, p322-335 |
 | Dungeons: site type, inhabitants, rooms, exits and egresses, map features, stocking, wandering encounters | Creating Exploration Challenges, p234-247 |
+| Adventures: combat, investigation, and social challenges, with optional prompts from a site, faction, or nation | Creating Combat, Investigation, and Social Challenges, p230-233, p248-253 |
+| Treasure for an adventure: silver piece value of the site, magic items, jewelry, and valuables | Placing Treasures, p256-257 |
+| Premium only: fractal adventure seeds and oracular adventure adjustments in an adventure | Deluxe edition, Additional GM Tools, p376-383 |
 
 ### Seeds and regeneration
 
@@ -64,6 +67,24 @@ Each dungeon page shows a small room map. Click **⤢ Pop out map**, or click a 
 - Click an exit number in the side card to move to that room.
 - Press **Esc** or **✕** to close the view.
 
+### Adventures
+
+The **Adventures** tab builds an adventure from the challenge tables in "Creating Adventures":
+
+- **Combat challenge** (p230-233): a target, what is going on now, a problem, a twist, and a complication for an urban dwelling, wilderness lair, or Deep chamber. A bestial monster target uses "What's That Bestial Monster Doing?" instead.
+- **Investigation challenge** (p248-251): the hook, the introduction, three investigation scenes with a complication each, the culprit's reaction, the failsafe cost, and a resolution twist.
+- **Social challenge** (p252-253): the one-roll social challenge target.
+- **Treasure** (p256-257): the total silver piece value (pick a site line, roll 2d6 for the column), magic items by owner type, and three valuables with a reason each is special.
+
+With premium (Deluxe) data loaded, two more sections are available. Without it, they show a 🔒 and the app skips them:
+
+- **Fractal adventure seed** (Deluxe p380-383): the anchor site's tags give one Enemy, Friend, Complication, Thing, and Place. A d100 roll gives the premise seed. Each **Fractal steps** step takes a component of the latest seed and rolls a d20 seed of that kind to complicate it. With no anchor, two random tags of one kind give the components.
+- **Oracular adventure adjustments** (Deluxe p376-377): the hook bait and how it is introduced, a theme, a mistake, a reality that intrudes, a change to a key NPC, an event, and an affirmation or negation of your main idea.
+
+Pick an anchor (a site, faction, or nation) to set the defaults and add prompts. A faction uses its Base of Influence and a nation uses its capital. The prompts are problems from the site, one element of each kind from its two tags, and a faction's goal or a nation's current problems. Each site page, faction page, and nation page also has a **Create adventure here** button.
+
+Click ↻ next to a line to roll that table or seed again. Adventures are saved with the world and exported to `Adventures/` in the Obsidian vault. Regenerating a layer deletes the adventures whose anchor no longer exists.
+
 The app saves the current world in the browser. Use **Save JSON** and **Load JSON** to keep worlds as files. You can rename any entity and add notes. Renames and notes are saved and exported.
 
 ### Obsidian export
@@ -75,7 +96,7 @@ The vault contains:
 - `<Region>.md`: the overview note with a `leaflet` map block.
 - `Maps/<Region>.png` and `.svg`: the rendered hex map.
 - `Locations/Cities`, `Communities`, `Courts`, `Ruins`, `Wilderness`: one note per site. Each note has `location` and `mapmarker` frontmatter, so it shows as a marker on the map.
-- `Nations`, `Factions`, `Gods`, `Geography`, `Dungeons`: linked notes. Dungeon notes include an SVG map and a Mermaid diagram.
+- `Nations`, `Factions`, `Gods`, `Geography`, `Dungeons`, `Adventures`: linked notes. Dungeon notes include an SVG map and a Mermaid diagram.
 - `world.json`: the full world. Load it in the app to continue work.
 - `.obsidian/plugins/obsidian-leaflet-plugin/`: the community plugin **Obsidian Leaflet**, which draws the map. `.obsidian/community-plugins.json` enables it.
 
@@ -88,7 +109,8 @@ The app bundles Obsidian Leaflet (MIT license, [javalent/obsidian-leaflet](https
 The free edition of *Worlds Without Number* is the source of all bundled data (`src/data/free.json`). The Deluxe edition adds more GM tools. The app does not ship that content. These tools are locked until you load your own data:
 
 - NPC generator (Random NPC Types, One-Roll Characterization Tables)
-- Fractal adventure seeds, filled from each site's tags
+- Fractal adventure seeds, filled from each site's tags, and as a section in the Adventures tab
+- Oracular adventure adjustments, as a section in the Adventures tab
 - Architectural styles for nations
 - Infernal Iterums and summoned Iterum creatures
 - Adventure hooks and oracle tables
@@ -116,7 +138,7 @@ src/
   data.ts             table lookup and dice rolls; premium data loading
   rng.ts              seeded random numbers
   names.ts            invented name styles ("linguistic touchstones")
-  gen/                terrain, nations, sites, factions, dungeons, premium tools
+  gen/                terrain, nations, sites, factions, dungeons, adventures, premium tools
   render/             SVG for the hex map and dungeon maps
   export/obsidian.ts  vault export
   main.ts             user interface
@@ -155,6 +177,11 @@ npm test
 - Each nation rolls one dark theme (1d10) and one bright theme (1d10+10).
 - Site names, region names, and the name styles are invented by this app, not taken from the book.
 - The d20 site density is an extra option. The book lists d6 to d12.
+- An adventure's default treasure site line and magic item owner line come from its anchor site (for example, a business court uses "Merchant prince's estate"). The book says to pick the most appropriate line.
+- "Three or More" magic items gives three items. Add more if it fits.
+- A combat target in a wilderness lair or Deep chamber is a bestial monster 40% of the time, unless you pick one.
+- An adventure's fractal seed uses the same tag components that its prompts show. Each fractal step complicates a component of the latest seed. The book lets you complicate any component of any seed.
+- The site page's **Fractal adventure seed** button adds one complication step 60% of the time.
 
 ## Legal
 

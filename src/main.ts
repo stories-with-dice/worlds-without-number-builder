@@ -1,22 +1,23 @@
 import './style.css';
-import type { Dungeon, Extra, Fact, Settings, Site, World } from './types';
+import type { Adventure, ChallengeKind, Dungeon, Extra, Fact, Settings, Site, World } from './types';
 import { Rng, randomSeed } from './rng';
-import { free, getPremium, loadPremium, setPremium, tablePage, tag, validatePremium, matrix } from './data';
+import { free, getPremium, grid as gridTable, isTable, loadPremium, roll, setPremium, tablePage, tag, validatePremium, matrix } from './data';
 import { buildWorld, DEFAULT_SETTINGS, nameOf, reroll, SIZE_PRESETS, seedsFrom } from './gen/world';
 import { center, Grid, hexLabel, mapPixelSize } from './gen/hex';
 import { TERRAIN_INFO } from './gen/terrain';
 import { DEFAULT_LAYERS, hexPolygon, MapLayers, renderMapSvg, SITE_STYLE } from './render/map';
 import { renderDungeonSvg, ROOM_COLORS } from './render/dungeon';
 import { generateDungeon, INHABITANT_KINDS } from './gen/dungeon';
+import { availableKinds, CHALLENGES, generateAdventure, LAIRS } from './gen/adventure';
 import { DENSITY_LABEL, COURT_LABEL } from './gen/sites';
 import { income } from './gen/factions';
-import { adventureSeed, architecture, hook, iterum, npc, premiumReady } from './gen/premium';
+import { adventureSeed, architecture, hook, iterum, npc, premiumReady, rerollSeed } from './gen/premium';
 import { exportVault, safe } from './export/obsidian';
 
 // ---------------------------------------------------------------- state
 
-type Tab = 'details' | 'nations' | 'sites' | 'factions' | 'gods' | 'dungeons' | 'lore' | 'premium';
-type Sel = { kind: 'hex'; id: number } | { kind: 'site' | 'nation' | 'faction' | 'god' | 'feature' | 'dungeon'; id: string } | null;
+type Tab = 'details' | 'nations' | 'sites' | 'factions' | 'gods' | 'dungeons' | 'adventures' | 'lore' | 'premium';
+type Sel = { kind: 'hex'; id: number } | { kind: 'site' | 'nation' | 'faction' | 'god' | 'feature' | 'dungeon' | 'adventure'; id: string } | null;
 
 const WORLD_KEY = 'wwn.world';
 const LAYERS_KEY = 'wwn.layers';
@@ -314,6 +315,7 @@ function viewSite(s: Site): string {
       <select id="dungeon-rooms">${[10, 20, 30, 40].map((r) => `<option value="${r}" ${r === 20 ? 'selected' : ''}>${r} rooms</option>`).join('')}</select>
       <button class="small" data-action="site-dungeon" data-id="${s.id}">Generate ${s.kind === 'ruin' ? 'ruin' : 'exploration site'} dungeon</button>
     </div>
+    ${adventureLinks('site', s.id)}
     <h2>Premium tools</h2>
     <div class="row">${premiumButton('site-npc', 'Generate NPC', `data-id="${s.id}"`)} ${premiumButton('site-seed', 'Fractal adventure seed', `data-id="${s.id}"`)}</div>
     ${extras(s.id)}
@@ -336,6 +338,7 @@ function viewNation(id: string): string {
     <h2>Cities</h2>
     <ul class="list">${sites.filter((s) => s.kind === 'capital' || s.kind === 'city').map((s) => `<li data-action="select" data-kind="site" data-id="${s.id}">${esc(nameOf(world, s.id, s.name))}<span class="meta">${s.population?.toLocaleString('en-US') ?? ''}</span></li>`).join('')}</ul>
     <p class="muted">${sites.length} sites in total. ${world.factions.filter((f) => f.nation === id).map((f) => link('faction', f.id, nameOf(world, f.id, f.name))).join(', ')}</p>
+    ${adventureLinks('nation', n.id)}
     <h2>Premium tools</h2>
     <div class="row">${premiumButton('nation-arch', 'Architectural style', `data-id="${n.id}"`)} ${premiumButton('nation-npc', 'Notable NPC', `data-id="${n.id}"`)}</div>
     ${extras(n.id)}
@@ -367,6 +370,7 @@ function viewFaction(id: string): string {
     </table>
     <p class="muted" style="font-size:12px">Hover or tap an asset for its rules text.</p>
     <h2>Recent doings</h2>${facts(f.facts)}
+    ${adventureLinks('faction', f.id)}
     ${extras(f.id)}
     ${notesEditor(f.id)}`;
 }
@@ -436,6 +440,71 @@ function roomHtml(d: Dungeon, r: Dungeon['rooms'][number]): string {
       <br><span class="muted">Exits to ${exits.join(', ')}</span>`;
 }
 
+// ---------------------------------------------------------------- adventures
+
+const CHALLENGE_KINDS = Object.keys(CHALLENGES) as ChallengeKind[];
+
+/** Adventures anchored to an entity, plus a button that makes a new one there. */
+function adventureLinks(kind: 'site' | 'faction' | 'nation', id: string): string {
+  const list = world.adventures.filter((a) => a.anchor?.kind === kind && a.anchor.id === id);
+  return `<h2>Adventures</h2>
+    ${list.map((a) => `<div>${link('adventure', a.id, nameOf(world, a.id, a.name))} <span class="muted">(${a.sections.map((x) => x.kind).join(', ')})</span></div>`).join('')}
+    <div class="row"><button class="small" data-action="anchor-adventure" data-kind="${kind}" data-id="${id}">Create adventure here</button></div>`;
+}
+
+function listAdventures(): string {
+  const opt = (v: string, l: string) => `<option value="${esc(v)}">${esc(l)}</option>`;
+  const sites = [...world.sites].sort((a, b) => nameOf(world, a.id, a.name).localeCompare(nameOf(world, b.id, b.name)));
+  const anchorOptions = `${opt('', 'None')}${opt('random', 'Random site')}
+    <optgroup label="Sites">${sites.map((s) => opt(`site:${s.id}`, `${nameOf(world, s.id, s.name)} (${s.subtitle})`)).join('')}</optgroup>
+    <optgroup label="Factions">${world.factions.map((f) => opt(`faction:${f.id}`, nameOf(world, f.id, f.name))).join('')}</optgroup>
+    <optgroup label="Nations">${world.nations.map((n) => opt(`nation:${n.id}`, nameOf(world, n.id, n.name))).join('')}</optgroup>`;
+  const wide = 'style="width:190px"';
+  return `<p class="muted" style="font-size:13px">Build combat, investigation, social, and treasure challenges with the tables in "Creating Adventures" (p.230-257). Pick an anchor to use its tags and problems as prompts.</p>
+    <div class="field"><label for="adv-anchor">Anchor</label><select id="adv-anchor" ${wide}>${anchorOptions}</select></div>
+    <div class="field"><span>Challenges</span><span style="text-align:right">${CHALLENGE_KINDS.filter((k) => !CHALLENGES[k].premium).map((k) => `<label class="check" style="display:inline-flex;margin-left:8px"><input type="checkbox" id="adv-kind-${k}" checked> ${k}</label>`).join('')}</span></div>
+    <div class="field"><span>Premium</span><span style="text-align:right">${CHALLENGE_KINDS.filter((k) => CHALLENGES[k].premium).map((k) => {
+      const ok = premiumReady();
+      return `<label class="check" style="display:inline-flex;margin-left:8px" ${ok ? '' : 'title="Needs Deluxe data. See the Premium tab."'}><input type="checkbox" id="adv-kind-${k}" ${ok ? 'checked' : 'disabled'}> ${ok ? '' : '🔒 '}${k}</label>`;
+    }).join('')}</span></div>
+    <div class="field"><label for="adv-lair">Combat environment</label><select id="adv-lair" ${wide}>${opt('', 'From the anchor')}${Object.entries(LAIRS).map(([k, v]) => opt(k, v.label)).join('')}</select></div>
+    <div class="field"><label for="adv-beast">Combat target</label><select id="adv-beast" ${wide}>${opt('', 'From the anchor')}${opt('no', 'Sapient group')}${opt('yes', 'Bestial monster')}</select></div>
+    <div class="field"><label for="adv-value">Treasure site</label><select id="adv-value" ${wide}>${opt('', 'From the anchor')}${gridTable('treasure.siteValue').lines.map((l) => opt(l.name, l.name)).join('')}</select></div>
+    <div class="field"><label for="adv-steps">Fractal steps</label><select id="adv-steps" ${wide} ${premiumReady() ? '' : 'disabled'}>${[0, 1, 2, 3].map((n) => `<option value="${n}" ${n === 1 ? 'selected' : ''}>${n === 0 ? 'Premise only' : `${n} complication${n > 1 ? 's' : ''}`}</option>`).join('')}</select></div>
+    <div class="field"><label for="adv-owner">Magic item owner</label><select id="adv-owner" ${wide}>${opt('', 'From the treasure site')}${gridTable('treasure.magicChance').lines.map((l) => opt(l.name, l.name)).join('')}</select></div>
+    <div class="row"><button class="primary" data-action="generate-adventure">Generate adventure</button></div>
+    <h2>Adventures in this world</h2>
+    <ul class="list">${world.adventures.map((a) => `<li data-action="select" data-kind="adventure" data-id="${a.id}"><span>${esc(nameOf(world, a.id, a.name))}<br><span class="muted" style="font-size:12px">${esc(a.sections.map((x) => x.kind).join(', '))}</span></span><span class="meta">${a.anchor ? esc(anchorName(a)) : ''}</span></li>`).join('') || '<li class="muted">None yet.</li>'}</ul>`;
+}
+
+function anchorName(a: Adventure): string {
+  if (!a.anchor) return '';
+  const list: { id: string; name: string }[] = a.anchor.kind === 'site' ? world.sites : a.anchor.kind === 'faction' ? world.factions : world.nations;
+  const x = list.find((y) => y.id === a.anchor!.id);
+  return x ? nameOf(world, x.id, x.name) : '';
+}
+
+/** Facts with a ↻ button on each fact that comes from a die table. */
+function adventureFacts(a: Adventure, sec: number): string {
+  return `<ul class="facts">${a.sections[sec].facts.map((f, i) => {
+    const p = f.ref ? tablePage(f.ref) : undefined;
+    const again = f.ref && (isTable(f.ref) || (f.ref.startsWith('seeds.') && premiumReady())) ? ` <button class="small" data-action="reroll-fact" data-id="${a.id}" data-sec="${sec}" data-i="${i}" title="Roll this line again">↻</button>` : '';
+    return `<li><b>${esc(f.label)}:</b> ${esc(f.text)}${p ? `<span class="page">p.${p}</span>` : ''}${again}</li>`;
+  }).join('')}</ul>`;
+}
+
+function viewAdventure(id: string): string {
+  const a = world.adventures.find((x) => x.id === id)!;
+  const k = a.anchor?.kind;
+  return `${nameEditor(a.id, a.name)}
+    <div class="subtitle">Adventure${a.anchor ? ` · ${k} ${link(k!, a.anchor.id, anchorName(a))}` : ''}</div>
+    <div class="row"><button class="small" data-action="reroll-adventure" data-id="${a.id}">↻ Reroll</button><button class="small" data-action="delete-adventure" data-id="${a.id}">Delete</button><span class="muted" style="font-size:12px">Seed <code>${esc(a.seed)}</code></span></div>
+    ${a.prompts.length ? `<h2>Prompts from the anchor</h2>${facts(a.prompts)}` : ''}
+    ${a.sections.map((x, i) => `<h2>${esc(x.title)} <span class="page">p.${x.page}</span></h2>${adventureFacts(a, i)}`).join('')}
+    <p class="muted" style="font-size:12px">↻ next to a line rolls that table again.</p>
+    ${notesEditor(a.id)}`;
+}
+
 function listNations(): string {
   return `<ul class="list">${world.nations.map((n) => `<li data-action="select" data-kind="nation" data-id="${n.id}" data-focus="1"><span class="dot" style="background:${n.color}"></span>${esc(nameOf(world, n.id, n.name))}<span class="meta">${n.hexes.length} hexes<br>${n.population.toLocaleString('en-US')}</span></li>`).join('')}</ul>`;
 }
@@ -490,7 +559,8 @@ function viewPremium(): string {
       <li>Fractal adventure seeds filled from each site's tags</li>
       <li>Architectural style for nations</li>
       <li>Infernal Iterums and summoned Iterum creatures</li>
-      <li>Adventure hooks and oracle tables</li></ul>`;
+      <li>Adventure hooks and oracle tables</li>
+      <li>Fractal and oracular sections in the Adventures tab</li></ul>`;
   if (!p) {
     return `<h3>Premium tools</h3>
       <div class="lock">
@@ -505,7 +575,7 @@ npm run premium -- path/to/WorldsWithoutNumber_DeluxePDF.pdf</pre>
       </div>`;
   }
   return `<h3>Premium tools</h3><p><span class="badge ok">Deluxe tables loaded</span> ${Object.keys(p.tables).length} tables, ${Object.values(p.seeds).flat().length} adventure seeds.</p>
-    <p class="muted" style="font-size:13px">Site and nation tools are on each site's and nation's page. Region-wide tools:</p>
+    <p class="muted" style="font-size:13px">Site and nation tools are on each site's and nation's page. The Adventures tab adds fractal seed and oracle sections. Region-wide tools:</p>
     <div class="row">
       <button class="small" data-action="world-extra" data-gen="iterum">Infernal Iterum</button>
       <button class="small" data-action="world-extra" data-gen="summoned">Summoned Iterum creatures</button>
@@ -517,7 +587,7 @@ npm run premium -- path/to/WorldsWithoutNumber_DeluxePDF.pdf</pre>
 
 function renderPanel(): void {
   hideTip();
-  const tabs: [Tab, string][] = [['details', 'Details'], ['nations', 'Nations'], ['sites', 'Sites'], ['factions', 'Factions'], ['gods', 'Gods'], ['dungeons', 'Dungeons'], ['lore', 'Region'], ['premium', getPremium() ? 'Premium' : '🔒 Premium']];
+  const tabs: [Tab, string][] = [['details', 'Details'], ['nations', 'Nations'], ['sites', 'Sites'], ['factions', 'Factions'], ['gods', 'Gods'], ['dungeons', 'Dungeons'], ['adventures', 'Adventures'], ['lore', 'Region'], ['premium', getPremium() ? 'Premium' : '🔒 Premium']];
   $('#tabs').innerHTML = tabs.map(([k, l]) => `<button class="${tab === k ? 'active' : ''}" data-action="tab" data-tab="${k}">${l}</button>`).join('');
   let html = '';
   if (tab === 'details') {
@@ -529,11 +599,13 @@ function renderPanel(): void {
     else if (sel.kind === 'god') html = viewGod(sel.id);
     else if (sel.kind === 'feature') html = viewFeature(sel.id);
     else if (sel.kind === 'dungeon') html = viewDungeon(sel.id);
+    else if (sel.kind === 'adventure') html = viewAdventure(sel.id);
   } else if (tab === 'nations') html = listNations();
   else if (tab === 'sites') html = listSites();
   else if (tab === 'factions') html = listFactions();
   else if (tab === 'gods') html = listGods();
   else if (tab === 'dungeons') html = listDungeons();
+  else if (tab === 'adventures') html = listAdventures();
   else if (tab === 'lore') html = listLore();
   else html = viewPremium();
   $('#panel').innerHTML = html;
@@ -732,6 +804,22 @@ function addDungeon(d: Dungeon): void {
   select({ kind: 'dungeon', id: d.id });
 }
 
+function addAdventure(a: Adventure): void {
+  world.adventures = world.adventures.filter((x) => x.id !== a.id);
+  world.adventures.push(a);
+  save();
+  select({ kind: 'adventure', id: a.id });
+}
+
+/** A default adventure name: "<anchor> adventure", or "Adventure N". */
+function adventureName(anchor?: Adventure['anchor']): string {
+  const n = world.adventures.length + 1;
+  if (!anchor) return `Adventure ${n}`;
+  const base = anchorName({ anchor } as Adventure);
+  const k = world.adventures.filter((x) => x.anchor?.id === anchor.id).length;
+  return `${base} adventure${k ? ` ${k + 1}` : ''}`;
+}
+
 async function handle(action: string, el: HTMLElement): Promise<void> {
   const id = el.dataset.id ?? '';
   const site = () => world.sites.find((s) => s.id === id)!;
@@ -785,6 +873,52 @@ async function handle(action: string, el: HTMLElement): Promise<void> {
       addDungeon(fresh);
       break;
     }
+    case 'generate-adventure': {
+      const v = (q: string) => ($(q) as HTMLSelectElement).value;
+      const kinds = availableKinds().filter((k) => ($(`#adv-kind-${k}`) as HTMLInputElement).checked);
+      if (!kinds.length) { toast('Select at least one challenge'); break; }
+      const seed = randomSeed();
+      let a = v('#adv-anchor');
+      if (a === 'random') a = `site:${new Rng(seed).pick(world.sites).id}`;
+      const [kind, aid] = a.split(':');
+      const anchor = a ? { kind: kind as 'site' | 'faction' | 'nation', id: aid } : undefined;
+      const beast = v('#adv-beast');
+      addAdventure(generateAdventure(seed, {
+        kinds,
+        lair: (v('#adv-lair') || undefined) as keyof typeof LAIRS | undefined,
+        beast: beast ? beast === 'yes' : undefined,
+        siteValue: v('#adv-value') || undefined,
+        owner: v('#adv-owner') || undefined,
+        fractalSteps: +v('#adv-steps'),
+      }, world, anchor, adventureName(anchor)));
+      break;
+    }
+    case 'anchor-adventure': {
+      const anchor = { kind: el.dataset.kind as 'site' | 'faction' | 'nation', id };
+      addAdventure(generateAdventure(randomSeed(), { kinds: availableKinds() }, world, anchor, adventureName(anchor)));
+      break;
+    }
+    case 'reroll-adventure': {
+      const a = world.adventures.find((x) => x.id === id)!;
+      const fresh = generateAdventure(randomSeed(), a.options, world, a.anchor, a.name);
+      if (fresh.sections.length < a.options.kinds.length) toast('Premium sections need Deluxe data. See the Premium tab.');
+      if (world.overrides[a.id]) { world.overrides[fresh.id] = world.overrides[a.id]; delete world.overrides[a.id]; }
+      world.adventures = world.adventures.map((x) => (x.id === id ? fresh : x));
+      save();
+      select({ kind: 'adventure', id: fresh.id });
+      break;
+    }
+    case 'reroll-fact': {
+      const fact = world.adventures.find((x) => x.id === id)?.sections[+el.dataset.sec!]?.facts[+el.dataset.i!];
+      if (!fact?.ref) break;
+      const rng = new Rng(randomSeed());
+      const seed = rerollSeed(fact.ref, rng);
+      if (seed) { fact.text = seed.text; fact.label = fact.label.replace(/\(seed \d+\)$/, `(seed ${seed.n})`); } else fact.text = roll(fact.ref, rng);
+      save();
+      renderPanel();
+      break;
+    }
+    case 'delete-adventure': world.adventures = world.adventures.filter((x) => x.id !== id); save(); sel = null; tab = 'adventures'; renderPanel(); break;
     case 'delete-dungeon': world.dungeons = world.dungeons.filter((x) => x.id !== id); save(); sel = null; tab = 'dungeons'; renderPanel(); break;
     case 'site-npc': { const s = site(); addExtra(s.id, npc(new Rng(randomSeed()), styleOf(s), s.meta.courtType === 'criminal' ? 'criminals' : s.kind === 'community' ? 'villagers' : undefined)); break; }
     case 'site-seed': addExtra(id, adventureSeed(new Rng(randomSeed()), site())); break;
@@ -820,7 +954,7 @@ async function handle(action: string, el: HTMLElement): Promise<void> {
 
 function findEntity(s: Exclude<Sel, null>): unknown {
   if (s.kind === 'hex') return true;
-  const lists: Record<string, { id: string }[]> = { site: world.sites, nation: world.nations, faction: world.factions, god: world.gods, feature: world.features, dungeon: world.dungeons };
+  const lists: Record<string, { id: string }[]> = { site: world.sites, nation: world.nations, faction: world.factions, god: world.gods, feature: world.features, dungeon: world.dungeons, adventure: world.adventures };
   return lists[s.kind].find((x) => x.id === s.id);
 }
 
@@ -861,7 +995,7 @@ function wireEvents(): void {
       try {
         const w = JSON.parse(await el.files[0].text()) as World;
         if (w.version !== 1 || !w.hexes || !w.seeds) throw new Error('not a world file from this app');
-        world = { ...w, extras: w.extras ?? {}, overrides: w.overrides ?? {} };
+        world = { ...w, adventures: w.adventures ?? [], extras: w.extras ?? {}, overrides: w.overrides ?? {} };
         sel = null; save(); renderAll(); fitView();
         toast(`Loaded ${world.regionName}`);
       } catch (err) { toast(`Could not load: ${(err as Error).message}`); }
@@ -890,7 +1024,7 @@ async function start(): Promise<void> {
   try { layers = { ...DEFAULT_LAYERS, ...JSON.parse(localStorage.getItem(LAYERS_KEY) ?? '{}') }; } catch { /* defaults */ }
   let saved: World | null = null;
   try { saved = JSON.parse(localStorage.getItem(WORLD_KEY) ?? 'null'); } catch { saved = null; }
-  world = saved && saved.version === 1 ? { ...saved, extras: saved.extras ?? {}, overrides: saved.overrides ?? {} } : buildWorld(DEFAULT_SETTINGS, randomSeed());
+  world = saved && saved.version === 1 ? { ...saved, adventures: saved.adventures ?? [], extras: saved.extras ?? {}, overrides: saved.overrides ?? {} } : buildWorld(DEFAULT_SETTINGS, randomSeed());
   wireEvents();
   wireMap();
   renderAll();

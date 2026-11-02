@@ -7,6 +7,7 @@ import { generateTerrain } from './terrain';
 import { generateNations } from './nations';
 import { generateSites } from './sites';
 import { generateFactions } from './factions';
+import { anchorExists } from './adventure';
 import { NameBook, placeName, STYLE_IDS } from '../names';
 
 export const DEFAULT_SETTINGS: Settings = { cols: 24, rows: 18, density: 8, nations: 5, factions: 4, oceanSides: -1, hexMiles: 8 };
@@ -38,7 +39,7 @@ export function buildWorld(settings: Settings, master: string, seeds: Seeds = se
   const world: World = {
     version: 1, master, settings: { ...settings }, seeds: { ...seeds }, regionName, regionStyle,
     oceanSides: terrain.oceanSides, hexes: terrain.hexes, rivers: terrain.rivers, roads: [], features: terrain.features,
-    gods: [], nations: [], sites: [], factions: [], dungeons: [], overrides: {}, extras: {},
+    gods: [], nations: [], sites: [], factions: [], dungeons: [], adventures: [], overrides: {}, extras: {},
   };
   rebuildNations(world);
   return world;
@@ -64,6 +65,8 @@ export function rebuildSites(world: World): void {
 
 export function rebuildFactions(world: World): void {
   world.factions = generateFactions(world.settings.factions, world.nations, world.sites, world.gods, world.seeds.factions);
+  // Adventures can be anchored to a site, faction, or nation; drop the ones whose anchor no longer exists.
+  world.adventures = (world.adventures ?? []).filter((a) => !a.anchor || anchorExists(world, a.anchor));
 }
 
 /** Gives one layer a fresh seed and rebuilds it and the layers below it. */
@@ -71,7 +74,7 @@ export function reroll(world: World, layer: keyof Seeds): void {
   world.seeds[layer] = `${randomSeed()}:${layer}`;
   if (layer === 'terrain') {
     const fresh = buildWorld(world.settings, world.master, world.seeds);
-    Object.assign(world, fresh, { overrides: world.overrides, extras: world.extras });
+    Object.assign(world, fresh, { overrides: world.overrides, extras: world.extras, adventures: world.adventures.filter((a) => !a.anchor) });
   } else if (layer === 'nations') rebuildNations(world);
   else if (layer === 'sites') rebuildSites(world);
   else rebuildFactions(world);

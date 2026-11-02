@@ -1,8 +1,8 @@
 // Generators that need Deluxe-only tables ("Additional GM Tools" and "Iterums", WWN Deluxe p370-391).
 // They work only after the user loads premium.json made by the premium CLI from their own PDF.
 import { Rng } from '../rng';
-import { getPremium, roll, tag } from '../data';
-import type { SeedKind } from '../data';
+import { free, getPremium, roll, tag } from '../data';
+import type { SeedKind, TagKind } from '../data';
 import type { Extra, Fact, Site } from '../types';
 import { personName } from '../names';
 
@@ -60,29 +60,79 @@ const KIND_FIELD: Record<SeedKind, 'enemies' | 'friends' | 'complications' | 'th
   enemy: 'enemies', friend: 'friends', complication: 'complications', thing: 'things', place: 'places',
 };
 
-/**
- * Fractal adventure seed (p380-383): roll a d100 seed, then fill its Enemy, Friend,
- * Complication, Thing, and Place slots from the site's two tags.
- */
-export function adventureSeed(rng: Rng, site: Site): Extra {
+export const SEED_KINDS = Object.keys(KIND_FIELD) as SeedKind[];
+const cap = (k: string) => k.charAt(0).toUpperCase() + k.slice(1);
+
+/** One fractal component: an Enemy, Friend, Complication, Thing, or Place taken from a tag (p380). */
+export interface Component { kind: SeedKind; tag: string; text: string }
+
+/** One component of each kind from a list of tags (one tag picked per component). */
+export function tagComponents(kind: TagKind, tagNames: string[], rng: Rng): Component[] {
+  const tags = tagNames.map((n) => tag(kind, n)).filter((t) => t !== undefined);
+  if (!tags.length) return [];
+  return SEED_KINDS.flatMap((k) => {
+    const t = rng.pick(tags);
+    const list = t[KIND_FIELD[k]];
+    return list.length ? [{ kind: k, tag: t.name, text: rng.pick(list) }] : [];
+  });
+}
+
+/** A seed fact. The ref "seeds.<kind>" (or "seeds.any") lets the app roll it again. */
+function seedFact(label: string, kind: SeedKind | 'any', rng: Rng): Fact & { kinds: SeedKind[] } {
   const p = getPremium()!;
-  const all = Object.values(p.seeds).flat();
-  const seed = rng.pick(all);
-  const tags = site.tags.map((n) => tag(site.tagKind, n)).filter((t) => !!t);
-  const facts: Fact[] = [{ label: `Seed ${seed.n}`, text: seed.text }];
-  for (const kind of Object.keys(KIND_FIELD) as SeedKind[]) {
-    const word = kind.charAt(0).toUpperCase() + kind.slice(1);
-    if (!new RegExp(`\\b${word}`).test(seed.text)) continue;
-    const options = tags.flatMap((t) => t![KIND_FIELD[kind]]);
-    if (options.length) facts.push({ label: word, text: rng.pick(options) });
+  const seed = rng.pick(kind === 'any' ? Object.values(p.seeds).flat() : p.seeds[kind]);
+  return { label: `${label} (seed ${seed.n})`, text: seed.text, ref: `seeds.${kind}`, kinds: SEED_KINDS.filter((k) => new RegExp(`\\b${cap(k)}`).test(seed.text)) };
+}
+
+/** Rolls a seed again for a fact made by `fractal`. Returns undefined for other refs. */
+export function rerollSeed(ref: string, rng: Rng): { n: number; text: string } | undefined {
+  const m = ref.match(/^seeds\.(\w+)$/);
+  const p = getPremium();
+  if (!m || !p) return undefined;
+  return rng.pick(m[1] === 'any' ? Object.values(p.seeds).flat() : p.seeds[m[1] as SeedKind] ?? []);
+}
+
+/**
+ * Fractal adventure seeds (p380-383):
+ *  1. Get one Enemy, Friend, Complication, Thing, and Place from the site's tags.
+ *     With no tags, two random tags of one kind give the components.
+ *  2. Roll a d100 premise seed and plug the components into it.
+ *  3. For each step, take a component of the latest seed and roll a d20 seed of its kind to complicate it.
+ */
+export function fractal(rng: Rng, components: Component[], steps: number): Fact[] {
+  if (!components.length) {
+    const kind = rng.pick(['community', 'court', 'ruin', 'wilderness'] as const);
+    components = tagComponents(kind, rng.shuffle(free.tags[kind].map((t) => t.name)).slice(0, 2), rng);
   }
-  // One fractal step: complicate one component with a seed of its own kind.
-  const kinds = facts.slice(1).map((x) => x.label.toLowerCase() as SeedKind);
-  if (kinds.length && rng.chance(0.6)) {
-    const k = rng.pick(kinds);
-    facts.push({ label: `Complicate the ${k}`, text: rng.pick(p.seeds[k]).text });
+  const facts: Fact[] = components.map((c) => ({ label: `${cap(c.kind)} (${c.tag})`, text: c.text }));
+  let last = seedFact('Premise', 'any', rng);
+  facts.push(last);
+  for (let i = 1; i <= steps && last.kinds.length; i++) {
+    const k = rng.pick(last.kinds);
+    last = seedFact(`Step ${i}: complicate the ${k}`, k, rng);
+    facts.push(last);
   }
+  return facts.map(({ label, text, ref }) => ({ label, text, ref }));
+}
+
+/** Fractal adventure seed for a site page, with one complication step 60% of the time. */
+export function adventureSeed(rng: Rng, site: Site): Extra {
+  const facts = fractal(rng, tagComponents(site.tagKind, site.tags, rng), rng.chance(0.6) ? 1 : 0);
   return { id: `seed-${rng.seed}`, title: `Adventure seed: ${site.name}`, facts };
+}
+
+/** Adventure hooks (p376) and oracular adventure adjustments (p377), for an adventure section. */
+export function oracle(rng: Rng): Fact[] {
+  return [
+    f('Bait for the hook', 'hooks.bait', rng),
+    f('How the hook is introduced', 'hooks.intro', rng),
+    f('Theme that informs the adventure', 'oracle.theme', rng),
+    f('Mistake that twists the adventure', 'oracle.mistake', rng),
+    f('Reality that intrudes', 'oracle.reality', rng),
+    f('How to change a key NPC', 'oracle.npc', rng),
+    f('Event to throw in', 'oracle.event', rng),
+    f('Is your main idea right? (affirmation or negation)', 'oracle.affirm', rng),
+  ];
 }
 
 /** Infernal Iterum (p371) or summoned Iterum creature (p373). */

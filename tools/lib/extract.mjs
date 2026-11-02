@@ -91,6 +91,28 @@ export async function extractMatrix(book, page, { id, title, groupMaxX = 150 }) 
   return { [id]: { title, page, groups: result } };
 }
 
+/**
+ * Parses a grid table such as "Silver Piece Value of the Site's Contents" (p256):
+ * a header line ("Type of Site | 2–3 | 4–5 ...") and one line per row with one cell per column.
+ * Reads the page as one column, so the grid's columns stay on one line.
+ */
+export async function extractGrid(book, page, { id, title, header }) {
+  const pg = await book.getPage(page, false);
+  const lines = pg.cols[0];
+  const cellsOf = (l) => l.segs.map((s) => cleanText(s.s)).filter(Boolean);
+  const t = lines.findIndex((l) => norm(cellsOf(l).join(' ')).startsWith(norm(title)));
+  const h = lines.findIndex((l, i) => i > t && norm(cellsOf(l)[0] ?? '').startsWith(norm(header)));
+  if (t < 0 || h < 0) throw new Error(`Grid ${id} not found on p${page}`);
+  const columns = cellsOf(lines[h]);
+  const rows = [];
+  for (const l of lines.slice(h + 1)) {
+    const cells = cellsOf(l);
+    if (cells.length !== columns.length) break;
+    rows.push({ name: cells[0], cells: cells.slice(1) });
+  }
+  return { [id]: { title: cellsOf(lines[t]).join(' '), page, columns: columns.slice(1), lines: rows } };
+}
+
 /** Parses "«Name:» description" paragraphs between pages. Stops at a heading with no colon. */
 export async function extractDefinitions(book, from, to, { skip = [] } = {}) {
   const defs = [];

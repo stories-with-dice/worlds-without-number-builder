@@ -2,11 +2,11 @@
 //   <Region>.md              overview note with the interactive map (```leaflet block)
 //   Maps/<Region>.png        the rendered hex map
 //   Locations/<kind>/*.md    one note per site; frontmatter `location` and `mapmarker` place it on the map
-//   Nations, Factions, Gods, Geography, Dungeons   linked notes
+//   Nations, Factions, Gods, Geography, Dungeons, Adventures   linked notes
 //   world.json               the full world, for re-import into the app
 //   .obsidian/plugins/obsidian-leaflet-plugin/   the Leaflet plugin itself (from public/), enabled
 import JSZip from 'jszip';
-import type { Dungeon, Extra, Fact, Faction, Site, World } from '../types';
+import type { Adventure, Dungeon, Extra, Fact, Faction, Site, World } from '../types';
 import { free, tablePage, tag } from '../data';
 import { center, Grid, hexLabel, mapPixelSize, SQRT3 } from '../gen/hex';
 import { TERRAIN_INFO } from '../gen/terrain';
@@ -90,6 +90,7 @@ export function buildVaultNotes(world: World): VaultFile[] {
   world.gods.forEach((x) => claim(x.id, name(x.id, x.name), 'god'));
   world.features.forEach((x) => claim(x.id, name(x.id, x.name), 'region'));
   world.dungeons.forEach((d) => claim(d.id, `${name(d.id, d.name)} (dungeon)`));
+  world.adventures.forEach((a) => claim(a.id, name(a.id, a.name), 'adventure'));
   const link = (id?: string) => (id && noteName.has(id) ? `[[${noteName.get(id)}]]` : '');
 
   const loc = (hex: number): [number, number] => {
@@ -142,7 +143,7 @@ ${(['capital', 'city', 'community', 'court', 'ruin', 'wilderness'] as const).map
   const list = world.sites.filter((s) => s.kind === k);
   return list.length ? `### ${SITE_STYLE[k].label}s\n${list.map((s) => `- ${link(s.id)} (hex ${hexLabel(g, s.hex)}): ${s.subtitle}`).join('\n')}` : '';
 }).filter(Boolean).join('\n\n')}
-${world.dungeons.length ? `\n## Dungeons\n${world.dungeons.map((d) => `- ${link(d.id)}`).join('\n')}\n` : ''}
+${world.dungeons.length ? `\n## Dungeons\n${world.dungeons.map((d) => `- ${link(d.id)}`).join('\n')}\n` : ''}${world.adventures.length ? `\n## Adventures\n${world.adventures.map((a) => `- ${link(a.id)}`).join('\n')}\n` : ''}
 ## Generation
 - Master seed: \`${world.master}\`
 - Layer seeds: terrain \`${world.seeds.terrain}\`, nations \`${world.seeds.nations}\`, sites \`${world.seeds.sites}\`, factions \`${world.seeds.factions}\`
@@ -250,6 +251,11 @@ ${extraBlocks(world.extras[s.id])}${notes(s.id)}`,
     files.push({ path: `Dungeons/${noteName.get(d.id)}.md`, content: dungeonNote(d, svgName, link(d.siteId)) });
   }
 
+  // Adventures
+  for (const a of world.adventures) {
+    files.push({ path: `Adventures/${noteName.get(a.id)}.md`, content: adventureNote(a, nameOf(world, a.id, a.name), link(a.anchor?.id)) + notes(a.id) });
+  }
+
   files.push({ path: 'world.json', content: JSON.stringify(world) });
   files.push({ path: '.obsidian/community-plugins.json', content: JSON.stringify([LEAFLET_PLUGIN_ID], null, 2) });
   return files;
@@ -339,6 +345,17 @@ ${d.rooms.map((r) => {
 Roll 1d6 after each scene or move between rooms; on a 1, roll here.
 
 ${d.wandering.map((w, i) => `${i + 1}. ${w}`).join('\n')}
+`;
+}
+
+export function adventureNote(a: Adventure, title: string, anchorLink: string): string {
+  return `---
+tags: [wwn/adventure]
+seed: ${JSON.stringify(a.seed)}
+---
+# ${title}
+
+${anchorLink ? `Anchor: ${anchorLink}\n\n` : ''}${a.prompts.length ? `## Prompts from the anchor\n${factLines(a.prompts)}\n\n` : ''}${a.sections.map((x) => `## ${x.title} *(WWN p. ${x.page})*\n${factLines(x.facts)}`).join('\n\n')}
 `;
 }
 

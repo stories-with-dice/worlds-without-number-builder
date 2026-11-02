@@ -120,6 +120,30 @@ export interface Dungeon {
   wandering: string[];
 }
 
+export type ChallengeKind = 'combat' | 'investigation' | 'social' | 'treasure' | 'fractal' | 'oracle';
+export type LairKind = 'urban' | 'wild' | 'deep';
+export type AnchorKind = 'site' | 'faction' | 'nation';
+
+/** Choices for the adventure generator. Empty values mean "pick from the anchor, or at random". */
+export interface AdventureOptions {
+  kinds: ChallengeKind[];
+  lair?: LairKind;        // combat environment (p232-233)
+  beast?: boolean;        // combat target is a bestial monster (p233)
+  siteValue?: string;     // line of the site treasure value table (p256)
+  owner?: string;         // line of the magic item chance table (p257)
+  fractalSteps?: number;  // complication steps after the premise seed (Deluxe p380)
+}
+
+export interface Adventure {
+  id: string;
+  seed: string;
+  name: string;
+  anchor?: { kind: AnchorKind; id: string };
+  options: AdventureOptions;
+  prompts: Fact[];        // context from the anchor: goal, problems, tag elements
+  sections: { kind: ChallengeKind; title: string; page: string; facts: Fact[] }[];
+}
+
 export interface Settings {
   cols: number;
   rows: number;
@@ -151,6 +175,7 @@ export interface World {
   sites: Site[];
   factions: Faction[];
   dungeons: Dungeon[];
+  adventures: Adventure[];
   overrides: Record<string, Override>;
   extras: Record<string, Extra[]>;
 }

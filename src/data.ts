@@ -6,6 +6,8 @@ import { Rng } from './rng';
 export interface Row { min: number; max: number; text: string; name?: string }
 export interface Table { title: string; die: number; page: number; rows: Row[] }
 export interface Matrix { title: string; page: number; groups: { name: string; entries: string[] }[] }
+/** A table with named lines and labeled columns instead of a die column (e.g. p256 site treasure value). */
+export interface Grid { title: string; page: number; columns: string[]; lines: { name: string; cells: string[] }[] }
 export interface Tag {
   name: string; description: string; page: number;
   enemies: string[]; friends: string[]; complications: string[]; things: string[]; places: string[];
@@ -19,7 +21,7 @@ export interface Seed { n: number; text: string }
 export type SeedKind = 'enemy' | 'friend' | 'complication' | 'thing' | 'place';
 
 interface FreeData {
-  tables: Record<string, Table | Matrix>;
+  tables: Record<string, Table | Matrix | Grid>;
   tags: Record<TagKind, Tag[]>;
   factions: { tags: { name: string; text: string; page: number }[]; goals: { name: string; text: string; page: number }[]; assets: Asset[] };
 }
@@ -91,6 +93,15 @@ export function matrix(id: string): Matrix {
   return free.tables[id] as Matrix;
 }
 
+export function grid(id: string): Grid {
+  return free.tables[id] as Grid;
+}
+
+/** True when `id` is a die table that `roll` can use. */
+export function isTable(id: string): boolean {
+  return findTable(id) !== undefined;
+}
+
 /** Formats a row: "Name: text", or "Name, text" when the book writes it as one phrase. */
 export function rowText(r: Row): string {
   if (!r.name) return r.text;
@@ -143,5 +154,5 @@ export function pickTags(kind: TagKind, rng: Rng, n = 2): string[] {
 }
 
 export function tablePage(id: string): number | undefined {
-  return findTable(id)?.page;
+  return findTable(id)?.page ?? free.tables[id]?.page;
 }

@@ -4,16 +4,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { buildVaultNotes, LEAFLET_PLUGIN_FILES, LEAFLET_PLUGIN_ID } from '../src/export/obsidian';
 import { generateDungeon } from '../src/gen/dungeon';
+import { generateAdventure } from '../src/gen/adventure';
 
 describe('obsidian vault', () => {
   const w = buildWorld(DEFAULT_SETTINGS, 'vault-test');
   w.dungeons.push(generateDungeon('dg', { rooms: 10 }, w.sites.find((s) => s.kind === 'ruin')));
+  w.adventures.push(generateAdventure('adv', { kinds: ['combat', 'investigation', 'social', 'treasure'] }, w, { kind: 'site', id: w.sites[0].id }, w.sites[0].name));
   const files = buildVaultNotes(w);
   const paths = files.map((f) => f.path);
 
   it('has unique paths and every note type', () => {
     expect(new Set(paths.map((p) => p.toLowerCase())).size).toBe(paths.length);
-    for (const dir of ['Nations/', 'Locations/Cities/', 'Factions/', 'Gods/', 'Geography/', 'Dungeons/']) {
+    for (const dir of ['Nations/', 'Locations/Cities/', 'Factions/', 'Gods/', 'Geography/', 'Dungeons/', 'Adventures/']) {
       expect(paths.some((p) => p.startsWith(dir))).toBe(true);
     }
   });
