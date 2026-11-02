@@ -10,13 +10,18 @@ function joinText(a, b) {
   return a + ' ' + b;
 }
 
-/** Splits "A thing, Another thing, A third" on commas that start a capitalized item. */
+/**
+ * Splits "A thing, Another thing, A third" on commas that start a capitalized item.
+ * Also splits on a period, or a comma with no space, because the book has a few such typos.
+ */
 export function splitList(s) {
   return s
-    .split(/,\s+(?=[A-Z“"'])/)
+    .split(/(?:[,.]\s+|,)(?=[A-Z“"'])/)
     .map((x) => x.trim().replace(/[.,]$/, ''))
     .filter(Boolean);
 }
+
+const allBold = (line) => line.segs.every((s) => s.st === 'B');
 
 function plain(line) {
   return line.segs.map((s) => (s.join ? s.s : (s === line.segs[0] ? s.s : ' ' + s.s))).join('').replace(/\s+/g, ' ').trim();
@@ -46,6 +51,11 @@ export async function parseTags(book, fromPage, toPage) {
         }
         if (!cur) continue;
         const key = first.st === 'B' && KEYS[first.s.trim()];
+        if (allBold(line) && !key) {
+          // A bold title that is not an E/F/C/T/P label starts the next chapter of the book.
+          cur = null;
+          continue;
+        }
         if (key) {
           field = key;
           cur[field] = [line.segs.slice(1).map((s) => s.s).join(' ').replace(/\s+/g, ' ').trim()];
